@@ -5,8 +5,10 @@
 #include <QDebug>
 #include <algorithm>
 #include "discretefouriertransform.h"
+#include "fftwdit.h"
 
 void drawPlot(QCustomPlot* plot, QVector<double> x, QVector<double> y, QString horizontalLabel = "x", QString verticalLabel = "y");
+void drawPlot(QCustomPlot* plot, QVector<double> x, QVector<std::complex<double>> y, QString horizontalLabel = "x", QString verticalLabel = "y", bool amplitude=true, bool real=false);
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -50,18 +52,18 @@ void MainWindow::createPlots()
         transform = new DiscreteFourierTransform();
         break;
     case 1:
-        throw std::logic_error("TODO");
+        transform = new FFTWDIT();
         break;
     case 2:
         throw std::logic_error("TODO");
     }
-    QVector<std::complex<double>> data = transform->directTransform(u0);
-    QVector<double> f = transform->getAmplitude(data);
-    drawPlot(ui->customPlot_2, t0, f, "f", "u");
-    QVector<double> phi = transform->getPhase(data);
-    drawPlot(ui->customPlot_3, t0, phi, "f", "phi");
-    QVector<double> original = transform->inverseTransform(data);
-    drawPlot(ui->customPlot_4, t0, original, "t", "u");
+    QVector<std::complex<double>> *data = transform->directTransform(u0);
+    drawPlot(ui->customPlot_2, t0, *data, "f", "u", true);
+    drawPlot(ui->customPlot_3, t0, *data, "f", "phi", false);
+    QVector<std::complex<double>> *original = transform->inverseTransform(*data);
+    drawPlot(ui->customPlot_4, t0, *original, "t", "u", false, true);
+    delete data;
+    delete original;
 }
 
 void drawPlot(QCustomPlot* plot, QVector<double> x, QVector<double> y, QString horizontalLabel, QString verticalLabel)
@@ -75,6 +77,32 @@ void drawPlot(QCustomPlot* plot, QVector<double> x, QVector<double> y, QString h
     plot->xAxis->setRange(*std::min_element(x.constBegin(), x.constEnd()), *std::max_element(x.constBegin(), x.constEnd()));
     plot->yAxis->setRange(*std::min_element(y.constBegin(), y.constEnd()), *std::max_element(y.constBegin(), y.constEnd()));
     plot->replot();
+}
+
+void drawPlot(QCustomPlot* plot, QVector<double> x, QVector<std::complex<double>> y, QString horizontalLabel, QString verticalLabel, bool amplitude, bool real)
+{
+    QVector<double> *u;
+    if (real)
+    {
+        u = new QVector<double>(y.size());
+        for (int i = 0;i<y.size();i++)
+        {
+            (*u)[i] = y[i].real();
+        }
+    }
+    else
+    {
+        if (amplitude)
+        {
+            u = Transform::getAmplitude(y);
+        }
+        else
+        {
+            u = Transform::getPhase(y);
+        }
+    }
+    drawPlot(plot, x, *u, horizontalLabel, verticalLabel);
+    delete u;
 }
 
 MainWindow::~MainWindow()

@@ -6,7 +6,7 @@ DiscreteFourierTransform::DiscreteFourierTransform()
 
 }
 
-QVector<std::complex<double>> DiscreteFourierTransform::directTransform(QVector<double> data)
+QVector<std::complex<double>> * DiscreteFourierTransform::directTransform(const QVector<std::complex<double>> & data)
 {
     QVector<std::complex<double>> *result = new QVector<std::complex<double>>(data.size());
     std::complex<double> e(exp(1.0), 0);
@@ -20,22 +20,32 @@ QVector<std::complex<double>> DiscreteFourierTransform::directTransform(QVector<
         }
         (*result)[k]= summ / static_cast<double>(data.size());
     }
-    return *(result);
+    return result;
 }
 
-QVector<double> DiscreteFourierTransform::inverseTransform(QVector<std::complex<double>> data)
+QVector<std::complex<double> > *DiscreteFourierTransform::directTransform(const QVector<double> &data)
 {
-    QVector<double> *result = new QVector<double>(data.size());
+    QVector<std::complex<double>> u(data.size());
+    for (int i = 0;i<data.size();i++)
+    {
+        u[i] = std::complex<double>(data[i], 0);
+    }
+    return directTransform(u);
+}
+
+QVector<std::complex<double>> *DiscreteFourierTransform::inverseTransform(const QVector<std::complex<double>> &data)
+{
+    QVector<std::complex<double>> *result = new QVector<std::complex<double>>(data.size());
     std::complex<double> e(exp(1.0), 0);
     for(int m = 0;m<data.size();m++)
     {
         std::complex<double> w = std::pow(e, -2. * std::complex<double>(0,1) * M_PI / static_cast<double>(data.size())); //W=e^(-2*pi*i/N)
-        double summ = 0;
+        std::complex<double> summ(0,0);
         for(int k = 0;k<data.size();k++)
         {
-            summ += (data[k] * std::pow(w, -1 * k * m)).real();
+            summ += data[k] * std::pow(w, -1 * k * m);
         }
         (*result)[m]= summ;
     }
-    return *(result);
+    return result;
 }
