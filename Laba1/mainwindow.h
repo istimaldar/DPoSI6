@@ -14,6 +14,7 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow(QWidget *parent = 0);
+    friend QVector<double> buildPlot(QVector<double> & data);
     ~MainWindow();
 
 private:

@@ -9,8 +9,8 @@ public:
     Transform();
     virtual QVector<std::complex<double>> directTransform(QVector<double> data) = 0;
     virtual QVector<double> inverseTransform(QVector<std::complex<double>> data) = 0;
-    double getAmplitude(std::complex<double> number);
-    double getPhase(std::complex<double> number);
+    QVector<double> getAmplitude(QVector<std::complex<double> > numbers);
+    QVector<double> getPhase(QVector<std::complex<double>> numbers);
 };
 
 #endif // TRANSFORM_H

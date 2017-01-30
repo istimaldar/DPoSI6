@@ -2,8 +2,11 @@
 #include "ui_mainwindow.h"
 #include <QVector>
 #include <math.h>
+#include <QDebug>
+#include <algorithm>
+#include "discretefouriertransform.h"
 
-double timePlot();
+void drawPlot(QCustomPlot* plot, QVector<double> x, QVector<double> y, QString horizontalLabel = "x", QString verticalLabel = "y");
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -32,26 +35,46 @@ MainWindow::MainWindow(QWidget *parent) :
 
 void MainWindow::createPlots()
 {
-    // generate some data:
-    QVector<double> x(NUMBER_OF_POINTS), y(NUMBER_OF_POINTS); // initialize with entries 0..100
+    QVector<double> t0(NUMBER_OF_POINTS), u0(NUMBER_OF_POINTS); // initialize with entries 0..100
     for (int i=0; i<NUMBER_OF_POINTS; i++)
     {
-      x[i] = (16. * i / NUMBER_OF_POINTS); // x goes from -1 to 1
-      qDebug() << x[i];
+      t0[i] = (16. * i / NUMBER_OF_POINTS); // x goes from -1 to 1
       double a = ui->lineEdit->text().toDouble();
       double b = ui->lineEdit_2->text().toDouble();
-      y[i] = cos(a * x[i]) + sin(b * x[i]); // let's plot a quadratic function
+      u0[i] = cos(a * t0[i]) + sin(b * t0[i]); // let's plot a quadratic function
     }
-    // create graph and assign data to it:
-    ui->customPlot->addGraph();
-    ui->customPlot->graph(0)->setData(x, y);
+    drawPlot(ui->customPlot, t0, u0, "t", "u");
+    Transform *transform;
+    switch (ui->comboBox_2->currentIndex()) {
+    case 0:
+        transform = new DiscreteFourierTransform();
+        break;
+    case 1:
+        throw std::logic_error("TODO");
+        break;
+    case 2:
+        throw std::logic_error("TODO");
+    }
+    QVector<std::complex<double>> data = transform->directTransform(u0);
+    QVector<double> f = transform->getAmplitude(data);
+    drawPlot(ui->customPlot_2, t0, f, "f", "u");
+    QVector<double> phi = transform->getPhase(data);
+    drawPlot(ui->customPlot_3, t0, phi, "f", "phi");
+    QVector<double> original = transform->inverseTransform(data);
+    drawPlot(ui->customPlot_4, t0, original, "t", "u");
+}
+
+void drawPlot(QCustomPlot* plot, QVector<double> x, QVector<double> y, QString horizontalLabel, QString verticalLabel)
+{
+    plot->addGraph();
+    plot->graph(0)->setData(x, y);
     // give the axes some labels:
-    ui->customPlot->xAxis->setLabel("t");
-    ui->customPlot->yAxis->setLabel("y");
+    plot->xAxis->setLabel(horizontalLabel);
+    plot->yAxis->setLabel(verticalLabel);
     // set axes ranges, so we see all data:
-    ui->customPlot->xAxis->setRange(0, 16);
-    ui->customPlot->yAxis->setRange(-2, 2);
-    ui->customPlot->replot();
+    plot->xAxis->setRange(*std::min_element(x.constBegin(), x.constEnd()), *std::max_element(x.constBegin(), x.constEnd()));
+    plot->yAxis->setRange(*std::min_element(y.constBegin(), y.constEnd()), *std::max_element(y.constBegin(), y.constEnd()));
+    plot->replot();
 }
 
 MainWindow::~MainWindow()
