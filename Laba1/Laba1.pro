@@ -31,12 +31,14 @@ SOURCES += main.cpp\
     qcustomplot.cpp \
     transform.cpp \
     discretefouriertransform.cpp \
-    fftwdit.cpp
+    fftwdit.cpp \
+    fftwdif.cpp
 
 HEADERS  += mainwindow.h \
     qcustomplot.h \
     transform.h \
     discretefouriertransform.h \
-    fftwdit.h
+    fftwdit.h \
+    fftwdif.h
 
 FORMS    += mainwindow.ui

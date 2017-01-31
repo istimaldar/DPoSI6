@@ -1,11 +1,12 @@
-#include "fftwdit.h"
+#include "fftwdif.h"
+#include <QDebug>
 
-FFTWDIT::FFTWDIT()
+FFTWDIF::FFTWDIF()
 {
 
 }
 
-QVector<std::complex<double>> *FFTWDIT::transform(const QVector<std::complex<double>> &data)
+QVector<std::complex<double> > *FFTWDIF::transform(const QVector<std::complex<double> > &data)
 {
     if (data.size() == 1)
     {
@@ -13,37 +14,31 @@ QVector<std::complex<double>> *FFTWDIT::transform(const QVector<std::complex<dou
         (*vector)[0] = data[0];
         return vector;
     }
-    QVector<std::complex<double>> even(data.size()/2);
-    QVector<std::complex<double>> odd(data.size()/2);
-    for (int i=0;i<data.size();i++)
-    {
-        if (!(i%2))
-        {
-            even[i/2] = data[i];
-        }
-        else
-        {
-            odd[i/2] = data[i];
-        }
-    }
-    QVector<std::complex<double>> *yEven = transform(even);
-    QVector<std::complex<double>> *yOdd = transform(odd);
+    QVector<std::complex<double>> b(data.size()/2);
+    QVector<std::complex<double>> c(data.size()/2);
     std::complex<double> e(exp(1.0), 0);
     std::complex<double> wn = std::pow(e, -2. * std::complex<double>(0,1) * M_PI / static_cast<double>(data.size()));
     std::complex<double> w(1, 0);
+    for (int i = 0;i<data.size()/2;i++)
+    {
+        b[i] = data[i] + data[i + data.size()/2];
+        c[i] = w * (data[i] - data[i + data.size()/2]);
+        w = w * wn;
+    }
+    QVector<std::complex<double>> *nb = transform(b);
+    QVector<std::complex<double>> *nc = transform(c);
     QVector<std::complex<double>> *y = new QVector<std::complex<double>>(data.size());
     for (int i = 0;i<data.size()/2;i++)
     {
-        (*y)[i] = ((*yEven)[i] + (w * (*yOdd)[i]));
-        (*y)[i + data.size()/2] = ((*yEven)[i] - (w * (*yOdd)[i]));
-        w = w * wn;
+        (*y)[2*i] = (*nb)[i];
+        (*y)[2*i+1] = (*nc)[i];
     }
-    delete yEven;
-    delete yOdd;
+    delete nb;
+    delete nc;
     return y;
 }
 
-QVector<std::complex<double> > *FFTWDIT::directTransform(const QVector<std::complex<double> > &data)
+QVector<std::complex<double> > *FFTWDIF::directTransform(const QVector<std::complex<double> > &data)
 {
     QVector<std::complex<double>> *y = transform(data);
     for (int i = 0;i<data.size();i++)
@@ -53,7 +48,7 @@ QVector<std::complex<double> > *FFTWDIT::directTransform(const QVector<std::comp
     return y;
 }
 
-QVector<std::complex<double> > *FFTWDIT::directTransform(const QVector<double> &data)
+QVector<std::complex<double> > *FFTWDIF::directTransform(const QVector<double> &data)
 {
     QVector<std::complex<double>> u(data.size());
     for (int i = 0;i<data.size();i++)
@@ -63,7 +58,7 @@ QVector<std::complex<double> > *FFTWDIT::directTransform(const QVector<double> &
     return directTransform(u);
 }
 
-QVector<std::complex<double>> * FFTWDIT::inverseTransform(const QVector<std::complex<double>> & data)
+QVector<std::complex<double> > *FFTWDIF::inverseTransform(const QVector<std::complex<double> > &data)
 {
     QVector<std::complex<double>> *result = new QVector<std::complex<double>>(data.size());
     std::complex<double> e(exp(1.0), 0);

@@ -6,6 +6,7 @@
 #include <algorithm>
 #include "discretefouriertransform.h"
 #include "fftwdit.h"
+#include "fftwdif.h"
 
 void drawPlot(QCustomPlot* plot, QVector<double> x, QVector<double> y, QString horizontalLabel = "x", QString verticalLabel = "y");
 void drawPlot(QCustomPlot* plot, QVector<double> x, QVector<std::complex<double>> y, QString horizontalLabel = "x", QString verticalLabel = "y", bool amplitude=true, bool real=false);
@@ -25,7 +26,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->comboBox->setSizePolicy(QSizePolicy::Ignored,QSizePolicy::Fixed);
     ui->comboBox_2->setSizePolicy(QSizePolicy::Ignored,QSizePolicy::Fixed);
     ui->pushButton->setSizePolicy(QSizePolicy::Ignored,QSizePolicy::Fixed);
-    for(int i=1; i<7; i++)
+    for(int i=1; i<10; i++)
     {
         ui->comboBox->addItem(QString::number(pow(2, i)));
     }
@@ -37,10 +38,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
 void MainWindow::createPlots()
 {
-    QVector<double> t0(NUMBER_OF_POINTS), u0(NUMBER_OF_POINTS); // initialize with entries 0..100
-    for (int i=0; i<NUMBER_OF_POINTS; i++)
+    int numberOfPoints = ui->comboBox->currentText().toInt();
+    QVector<double> t0(numberOfPoints), u0(numberOfPoints); // initialize with entries 0..100
+    for (int i=0; i<numberOfPoints; i++)
     {
-      t0[i] = (16. * i / NUMBER_OF_POINTS); // x goes from -1 to 1
+      t0[i] = (8. * i / numberOfPoints); // x goes from -1 to 1
       double a = ui->lineEdit->text().toDouble();
       double b = ui->lineEdit_2->text().toDouble();
       u0[i] = cos(a * t0[i]) + sin(b * t0[i]); // let's plot a quadratic function
@@ -55,7 +57,7 @@ void MainWindow::createPlots()
         transform = new FFTWDIT();
         break;
     case 2:
-        throw std::logic_error("TODO");
+        transform = new FFTWDIF();
     }
     QVector<std::complex<double>> *data = transform->directTransform(u0);
     drawPlot(ui->customPlot_2, t0, *data, "f", "u", true);
