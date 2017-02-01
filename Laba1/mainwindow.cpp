@@ -7,6 +7,7 @@
 #include "discretefouriertransform.h"
 #include "fftwdit.h"
 #include "fftwdif.h"
+#include <QStringList>
 
 void drawPlot(QCustomPlot* plot, QVector<double> x, QVector<double> y, QString horizontalLabel = "x", QString verticalLabel = "y");
 void drawPlot(QCustomPlot* plot, QVector<double> x, QVector<std::complex<double>> y, QString horizontalLabel = "x", QString verticalLabel = "y", bool amplitude=true, bool real=false);
@@ -16,6 +17,13 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    setupInterface();
+    setWindowTitle("Преобразования Фурье");
+    connect(ui->createPlotsEvent,SIGNAL(triggered(bool)),this,SLOT(createPlots()));
+}
+
+void MainWindow::setupInterface()
+{
     ui->label->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
     ui->label_2->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
     ui->label_3->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
@@ -26,6 +34,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->comboBox->setSizePolicy(QSizePolicy::Ignored,QSizePolicy::Fixed);
     ui->comboBox_2->setSizePolicy(QSizePolicy::Ignored,QSizePolicy::Fixed);
     ui->pushButton->setSizePolicy(QSizePolicy::Ignored,QSizePolicy::Fixed);
+    ui->tableWidget->setRowCount(9);
+    ui->tableWidget->setColumnCount(9);
+    ui->tableWidget->setHorizontalHeaderLabels(QStringList() << "ДПФсл" << "ДПФум" << "ДПФст" << "БПФПВсл" << "БПФПВум" << "БПФПВст" << "БПФПЧсл" << "БПФПЧум" << "БПФПЧст");
+    ui->tableWidget->setVerticalHeaderLabels(QStringList() << "2" << "4" << "8" << "16" << "32" << "64" << "128" << "256" << "512");
     for(int i=1; i<10; i++)
     {
         ui->comboBox->addItem(QString::number(pow(2, i)));
@@ -33,7 +45,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->comboBox_2->addItem("ДПФ");
     ui->comboBox_2->addItem("БПФ с прореживанием по времени");
     ui->comboBox_2->addItem("БПФ с прореживанием по частоте");
-    connect(ui->createPlotsEvent,SIGNAL(triggered(bool)),this,SLOT(createPlots()));
 }
 
 void MainWindow::createPlots()
@@ -66,6 +77,12 @@ void MainWindow::createPlots()
     drawPlot(ui->customPlot_4, t0, *original, "t", "u", false, true);
     delete data;
     delete original;
+    ui->tableWidget->setItem(log2(transform->getLastSize()) - 1, ui->comboBox_2->currentIndex() * 3,
+                             new QTableWidgetItem(QString::number(transform->getAddOperations())));
+    ui->tableWidget->setItem(log2(transform->getLastSize()) - 1, ui->comboBox_2->currentIndex() * 3 + 1,
+                             new QTableWidgetItem(QString::number(transform->getMulOperations())));
+    ui->tableWidget->setItem(log2(transform->getLastSize()) - 1, ui->comboBox_2->currentIndex() * 3 + 2,
+                             new QTableWidgetItem(QString::number(transform->getPowOperations())));
 }
 
 void drawPlot(QCustomPlot* plot, QVector<double> x, QVector<double> y, QString horizontalLabel, QString verticalLabel)

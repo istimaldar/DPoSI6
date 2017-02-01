@@ -3,7 +3,10 @@
 
 Transform::Transform()
 {
-
+    addOperations = 0;
+    mulOpirations = 0;
+    powOperations = 0;
+    lastSize = 0;
 }
 
 QVector<double> * Transform::getAmplitude(const QVector<std::complex<double>> & numbers)

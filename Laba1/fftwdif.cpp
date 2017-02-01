@@ -18,12 +18,16 @@ QVector<std::complex<double> > *FFTWDIF::transform(const QVector<std::complex<do
     QVector<std::complex<double>> c(data.size()/2);
     std::complex<double> e(exp(1.0), 0);
     std::complex<double> wn = std::pow(e, -2. * std::complex<double>(0,1) * M_PI / static_cast<double>(data.size()));
+    mulOpirations += 4;
+    powOperations += 1;
     std::complex<double> w(1, 0);
     for (int i = 0;i<data.size()/2;i++)
     {
         b[i] = data[i] + data[i + data.size()/2];
         c[i] = w * (data[i] - data[i + data.size()/2]);
         w = w * wn;
+        mulOpirations += 2;
+        addOperations += 4;
     }
     QVector<std::complex<double>> *nb = transform(b);
     QVector<std::complex<double>> *nc = transform(c);
@@ -40,10 +44,15 @@ QVector<std::complex<double> > *FFTWDIF::transform(const QVector<std::complex<do
 
 QVector<std::complex<double> > *FFTWDIF::directTransform(const QVector<std::complex<double> > &data)
 {
+    lastSize = data.size();
+    addOperations = 0;
+    mulOpirations = 0;
+    powOperations = 0;
     QVector<std::complex<double>> *y = transform(data);
     for (int i = 0;i<data.size();i++)
     {
         (*y)[i] /= static_cast<double>(data.size());
+        mulOpirations += 1;
     }
     return y;
 }
