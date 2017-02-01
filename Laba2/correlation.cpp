@@ -13,6 +13,8 @@ QVector<std::complex<double> > *Correlation::execute(const QVector<std::complex<
     for (int i = 0; i<first.size(); i++)
     {
         (*c)[i] = std::complex<double>((*cx)[i].real(), -((*cx)[i].imag())) * (*cy)[i];
+        transform.addMulOperations(1);
+        transform.addAddOperations(1);
     }
     QVector<std::complex<double>> *x = transform.inverseTransform((*c));
     delete c;

@@ -40,7 +40,7 @@ void MainWindow::setupInterface()
     ui->pushButton->setSizePolicy(QSizePolicy::Ignored,QSizePolicy::Fixed);   
     ui->tableWidget->setRowCount(9);
     ui->tableWidget->setColumnCount(9);
-    ui->tableWidget->setHorizontalHeaderLabels(QStringList() << "ДПФсл" << "ДПФум" << "ДПФст" << "БПФПВсл" << "БПФПВум" << "БПФПВст" << "БПФПЧсл" << "БПФПЧум" << "БПФПЧст");
+    ui->tableWidget->setHorizontalHeaderLabels(QStringList() << "КорДПФсл" << "КорДПФум" << "КорДПФст" << "СвДПФсл" << "СвДПФум" << "СвДПФст" << "КорБПФсл" << "КорБПФум" << "КорБПФст" << "СвБПФсл" << "СвБПФум" << "СвБПФст");
     ui->tableWidget->setVerticalHeaderLabels(QStringList() << "2" << "4" << "8" << "16" << "32" << "64" << "128" << "256" << "512");
     for(int i=1; i<10; i++)
     {
@@ -105,6 +105,12 @@ void MainWindow::createPlots()
     }
     QVector<std::complex<double>> *data = operation->execute(u0, u1, (*transform));
     drawPlot(ui->customPlot_3, t0, *data, "u", "phi");
+    ui->tableWidget->setItem(log2(transform->getLastSize()) - 1, ui->comboBox_2->currentIndex() * 3,
+                             new QTableWidgetItem(QString::number(transform->getAddOperations())));
+    ui->tableWidget->setItem(log2(transform->getLastSize()) - 1, ui->comboBox_2->currentIndex() * 3 + 1,
+                             new QTableWidgetItem(QString::number(transform->getMulOperations())));
+    ui->tableWidget->setItem(log2(transform->getLastSize()) - 1, ui->comboBox_2->currentIndex() * 3 + 2,
+                             new QTableWidgetItem(QString::number(transform->getPowOperations())));
 }
 
 void drawPlot(QCustomPlot* plot, QVector<double> x, QVector<double> y, QString horizontalLabel, QString verticalLabel)

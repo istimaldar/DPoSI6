@@ -7,12 +7,14 @@ Convolution::Convolution()
 
 QVector<std::complex<double> > *Convolution::execute(const QVector<std::complex<double> > &first, const QVector<std::complex<double> > &second, Transform & transform)
 {
+    transform.setZeroing(false);
     QVector<std::complex<double>> *cx = transform.directTransform(first);
     QVector<std::complex<double>> *cy = transform.directTransform(second);
     QVector<std::complex<double>> *c = new QVector<std::complex<double>>(first.size());
     for (int i = 0; i<first.size(); i++)
     {
         (*c)[i] = (*cx)[i] * (*cy)[i];
+        transform.addMulOperations(1);
     }
     QVector<std::complex<double>> *x = transform.inverseTransform((*c));
     delete c;

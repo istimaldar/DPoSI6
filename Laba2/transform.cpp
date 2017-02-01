@@ -7,6 +7,7 @@ Transform::Transform()
     mulOpirations = 0;
     powOperations = 0;
     lastSize = 0;
+    zeroing = false;
 }
 
 QVector<double> * Transform::getAmplitude(const QVector<std::complex<double>> & numbers)
@@ -25,4 +26,24 @@ QVector<double> * Transform::getPhase(const QVector<std::complex<double>> & numb
         (*result)[i] = atan(numbers[i].imag() / numbers[i].real());;
     }
     return result;
+}
+
+void Transform::addAddOperations(int value)
+{
+    addOperations += value;
+}
+
+void Transform::addMulOperations(int value)
+{
+    mulOpirations += value;
+}
+
+void Transform::addPowOperations(int value)
+{
+    powOperations += value;
+}
+
+void Transform::setZeroing(bool zeroing)
+{
+    this->zeroing = zeroing;
 }

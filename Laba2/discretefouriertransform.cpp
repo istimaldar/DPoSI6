@@ -9,9 +9,12 @@ DiscreteFourierTransform::DiscreteFourierTransform()
 QVector<std::complex<double>> * DiscreteFourierTransform::directTransform(const QVector<std::complex<double>> & data)
 {
     lastSize = data.size();
-    addOperations = 0;
-    mulOpirations = 0;
-    powOperations = 0;
+    if(zeroing)
+    {
+        addOperations = 0;
+        mulOpirations = 0;
+        powOperations = 0;
+    }
     QVector<std::complex<double>> *result = new QVector<std::complex<double>>(data.size());
     std::complex<double> e(exp(1.0), 0);
     for(int k = 0;k<data.size();k++)

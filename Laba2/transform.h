@@ -7,7 +7,8 @@ class Transform
 {
 protected:
     int addOperations, mulOpirations, powOperations;
-    int lastSize = 0;
+    int lastSize;
+    bool zeroing;
 public:
     Transform();
     virtual QVector<std::complex<double>> * directTransform(const QVector<std::complex<double>> & data) = 0;
@@ -19,6 +20,10 @@ public:
     int getMulOperations() { return mulOpirations; }
     int getPowOperations() { return powOperations; }
     int getLastSize() { return lastSize; }
+    void addAddOperations(int value);
+    void addMulOperations(int value);
+    void addPowOperations(int value);
+    void setZeroing(bool zeroing);
 };
 
 #endif // TRANSFORM_H
