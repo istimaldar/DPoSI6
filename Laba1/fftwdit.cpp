@@ -5,7 +5,7 @@ FFTWDIT::FFTWDIT()
 
 }
 
-QVector<std::complex<double>> *FFTWDIT::transform(const QVector<std::complex<double>> &data)
+QVector<std::complex<double>> *FFTWDIT::fastTransform(const QVector<std::complex<double>> &data, bool direction)
 {
     if (data.size() == 1)
     {
@@ -26,25 +26,30 @@ QVector<std::complex<double>> *FFTWDIT::transform(const QVector<std::complex<dou
             odd[i/2] = data[i];
         }
     }
-    QVector<std::complex<double>> *yEven = transform(even);
-    QVector<std::complex<double>> *yOdd = transform(odd);
+    QVector<std::complex<double>> *yEven = fastTransform(even, direction);
+    QVector<std::complex<double>> *yOdd = fastTransform(odd, direction);
     std::complex<double> e(exp(1.0), 0);
-    std::complex<double> wn = std::pow(e, -2. * std::complex<double>(0,1) * M_PI / static_cast<double>(data.size()));
+    std::complex<double> wn = std::pow(e, (direction ? -2. : 2.) * std::complex<double>(0,1) * M_PI / static_cast<double>(data.size()));
     std::complex<double> w(1, 0);
-    mulOpirations += 4;
-    powOperations += 1;
+    if (direction) mulOpirations += 4;
+    if (direction) powOperations += 1;
     QVector<std::complex<double>> *y = new QVector<std::complex<double>>(data.size());
     for (int i = 0;i<data.size()/2;i++)
     {
         (*y)[i] = ((*yEven)[i] + (w * (*yOdd)[i]));
         (*y)[i + data.size()/2] = ((*yEven)[i] - (w * (*yOdd)[i]));
         w = w * wn;
-        mulOpirations += 3;
-        addOperations += 2;
+        if (direction) mulOpirations += 3;
+        if (direction) addOperations += 2;
     }
     delete yEven;
     delete yOdd;
     return y;
+}
+
+QVector<std::complex<double>> *FFTWDIT::transform(const QVector<std::complex<double>> &data)
+{
+    return fastTransform(data, true);
 }
 
 QVector<std::complex<double> > *FFTWDIT::directTransform(const QVector<std::complex<double> > &data)
@@ -74,17 +79,5 @@ QVector<std::complex<double> > *FFTWDIT::directTransform(const QVector<double> &
 
 QVector<std::complex<double>> * FFTWDIT::inverseTransform(const QVector<std::complex<double>> & data)
 {
-    QVector<std::complex<double>> *result = new QVector<std::complex<double>>(data.size());
-    std::complex<double> e(exp(1.0), 0);
-    for(int m = 0;m<data.size();m++)
-    {
-        std::complex<double> w = std::pow(e, -2. * std::complex<double>(0,1) * M_PI / static_cast<double>(data.size())); //W=e^(-2*pi*i/N)
-        std::complex<double> summ(0,0);
-        for(int k = 0;k<data.size();k++)
-        {
-            summ += data[k] * std::pow(w, -1 * k * m);
-        }
-        (*result)[m]= summ;
-    }
-    return result;
+    return fastTransform(data, false);
 }

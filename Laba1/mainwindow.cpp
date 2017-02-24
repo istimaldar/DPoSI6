@@ -73,6 +73,8 @@ void MainWindow::createPlots()
     QVector<std::complex<double>> *data = transform->directTransform(u0);
     drawPlot(ui->customPlot_2, t0, *data, "f", "u", true);
     drawPlot(ui->customPlot_3, t0, *data, "f", "phi", false);
+    ui->customPlot_2->graph(0)->setLineStyle(QCPGraph::lsImpulse);
+    ui->customPlot_3->graph(0)->setLineStyle(QCPGraph::lsImpulse);
     QVector<std::complex<double>> *original = transform->inverseTransform(*data);
     drawPlot(ui->customPlot_4, t0, *original, "t", "u", false, true);
     delete data;
