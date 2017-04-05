@@ -7,6 +7,7 @@
 #include "discretefouriertransform.h"
 #include "fftwdit.h"
 #include "fftwdif.h"
+#include "discretewalshtransform.h"
 #include <QStringList>
 
 void drawPlot(QCustomPlot* plot, QVector<double> x, QVector<double> y, QString horizontalLabel = "x", QString verticalLabel = "y");
@@ -62,7 +63,7 @@ void MainWindow::createPlots()
     Transform *transform;
     switch (ui->comboBox_2->currentIndex()) {
     case 0:
-        transform = new DiscreteFourierTransform();
+        transform = new discreteWalshTransform();
         break;
     case 1:
         transform = new FFTWDIT();
@@ -72,19 +73,17 @@ void MainWindow::createPlots()
     }
     QVector<std::complex<double>> *data = transform->directTransform(u0);
     drawPlot(ui->customPlot_2, t0, *data, "f", "u", true);
-    drawPlot(ui->customPlot_3, t0, *data, "f", "phi", false);
     ui->customPlot_2->graph(0)->setLineStyle(QCPGraph::lsImpulse);
-    ui->customPlot_3->graph(0)->setLineStyle(QCPGraph::lsImpulse);
     QVector<std::complex<double>> *original = transform->inverseTransform(*data);
-    drawPlot(ui->customPlot_4, t0, *original, "t", "u", false, true);
+    drawPlot(ui->customPlot_3, t0, *original, "t", "u", false, true);
     delete data;
     delete original;
-    ui->tableWidget->setItem(log2(transform->getLastSize()) - 1, ui->comboBox_2->currentIndex() * 3,
-                             new QTableWidgetItem(QString::number(transform->getAddOperations())));
-    ui->tableWidget->setItem(log2(transform->getLastSize()) - 1, ui->comboBox_2->currentIndex() * 3 + 1,
-                             new QTableWidgetItem(QString::number(transform->getMulOperations())));
-    ui->tableWidget->setItem(log2(transform->getLastSize()) - 1, ui->comboBox_2->currentIndex() * 3 + 2,
-                             new QTableWidgetItem(QString::number(transform->getPowOperations())));
+//    ui->tableWidget->setItem(log2(transform->getLastSize()) - 1, ui->comboBox_2->currentIndex() * 3,
+//                             new QTableWidgetItem(QString::number(transform->getAddOperations())));
+//    ui->tableWidget->setItem(log2(transform->getLastSize()) - 1, ui->comboBox_2->currentIndex() * 3 + 1,
+//                             new QTableWidgetItem(QString::number(transform->getMulOperations())));
+//    ui->tableWidget->setItem(log2(transform->getLastSize()) - 1, ui->comboBox_2->currentIndex() * 3 + 2,
+//                             new QTableWidgetItem(QString::number(transform->getPowOperations())));
 }
 
 void drawPlot(QCustomPlot* plot, QVector<double> x, QVector<double> y, QString horizontalLabel, QString verticalLabel)

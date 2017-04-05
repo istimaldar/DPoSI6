@@ -33,7 +33,8 @@ SOURCES += main.cpp\
     discretefouriertransform.cpp \
     fftwdit.cpp \
     fftwdif.cpp \
-    utils.cpp
+    utils.cpp \
+    discretewalshtransform.cpp
 
 HEADERS  += mainwindow.h \
     qcustomplot.h \
@@ -41,6 +42,7 @@ HEADERS  += mainwindow.h \
     discretefouriertransform.h \
     fftwdit.h \
     fftwdif.h \
-    utils.h
+    utils.h \
+    discretewalshtransform.h
 
 FORMS    += mainwindow.ui
