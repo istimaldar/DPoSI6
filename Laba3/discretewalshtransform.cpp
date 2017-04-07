@@ -2,12 +2,12 @@
 #include <utils.h>
 #include <QDebug>
 
-discreteWalshTransform::discreteWalshTransform()
+DiscreteWalshTransform::discreteWalshTransform()
 {
 
 }
 
-QVector<std::complex<double>> *discreteWalshTransform::directTransform(const QVector<std::complex<double> > &data)
+QVector<std::complex<double>> *DiscreteWalshTransform::directTransform(const QVector<std::complex<double> > &data)
 {
     QVector<std::complex<double>> *result = new QVector<std::complex<double>>(data.size());
     for (int k = 0; k < data.size(); k++)
@@ -21,7 +21,7 @@ QVector<std::complex<double>> *discreteWalshTransform::directTransform(const QVe
     return result;
 }
 
-QVector<std::complex<double> > *discreteWalshTransform::directTransform(const QVector<double> &data)
+QVector<std::complex<double> > *DiscreteWalshTransform::directTransform(const QVector<double> &data)
 {
     QVector<std::complex<double>> u(data.size());
     for (int i = 0;i<data.size();i++)
@@ -31,7 +31,7 @@ QVector<std::complex<double> > *discreteWalshTransform::directTransform(const QV
     return directTransform(u);
 }
 
-QVector<std::complex<double>> *discreteWalshTransform::inverseTransform(const QVector<std::complex<double> > &data)
+QVector<std::complex<double>> *DiscreteWalshTransform::inverseTransform(const QVector<std::complex<double> > &data)
 {
     QVector<std::complex<double>> *result = new QVector<std::complex<double>>(data.size());
     for (int i = 0; i < data.size(); i++)

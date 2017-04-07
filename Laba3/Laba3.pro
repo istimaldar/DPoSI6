@@ -34,7 +34,8 @@ SOURCES += main.cpp\
     fftwdit.cpp \
     fftwdif.cpp \
     utils.cpp \
-    discretewalshtransform.cpp
+    discretewalshtransform.cpp \
+    fastwalshtransform.cpp
 
 HEADERS  += mainwindow.h \
     qcustomplot.h \
@@ -43,6 +44,7 @@ HEADERS  += mainwindow.h \
     fftwdit.h \
     fftwdif.h \
     utils.h \
-    discretewalshtransform.h
+    discretewalshtransform.h \
+    fastwalshtransform.h
 
 FORMS    += mainwindow.ui

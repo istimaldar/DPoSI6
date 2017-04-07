@@ -4,14 +4,13 @@
 #include <math.h>
 #include <QDebug>
 #include <algorithm>
-#include "discretefouriertransform.h"
-#include "fftwdit.h"
-#include "fftwdif.h"
+#include "fastwalshtransform.h"
 #include "discretewalshtransform.h"
 #include <QStringList>
 
-void drawPlot(QCustomPlot* plot, QVector<double> x, QVector<double> y, QString horizontalLabel = "x", QString verticalLabel = "y");
-void drawPlot(QCustomPlot* plot, QVector<double> x, QVector<std::complex<double>> y, QString horizontalLabel = "x", QString verticalLabel = "y", bool amplitude=true, bool real=false);
+void drawPlot(bool isImpulse, QCustomPlot* plot, QVector<double> x, QVector<double> y, QString horizontalLabel = "x", QString verticalLabel = "y");
+void drawPlot(bool isImpulse, QCustomPlot* plot, QVector<double> x, QVector<std::complex<double>> y, QString horizontalLabel = "x",
+              QString verticalLabel = "y", bool amplitude=true, bool real=false);
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -25,11 +24,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
 void MainWindow::setupInterface()
 {
-    ui->label->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
-    ui->label_2->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
-    ui->label_3->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
-    ui->label_4->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
-    ui->label_5->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
+    ui->label->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    ui->label_2->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    ui->label_3->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    ui->label_4->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    ui->label_5->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     ui->lineEdit->setSizePolicy(QSizePolicy::Ignored,QSizePolicy::Fixed);
     ui->lineEdit_2->setSizePolicy(QSizePolicy::Ignored,QSizePolicy::Fixed);
     ui->comboBox->setSizePolicy(QSizePolicy::Ignored,QSizePolicy::Fixed);
@@ -43,9 +42,8 @@ void MainWindow::setupInterface()
     {
         ui->comboBox->addItem(QString::number(pow(2, i)));
     }
-    ui->comboBox_2->addItem("ДПФ");
-    ui->comboBox_2->addItem("БПФ с прореживанием по времени");
-    ui->comboBox_2->addItem("БПФ с прореживанием по частоте");
+    ui->comboBox_2->addItem("ДПУ");
+    ui->comboBox_2->addItem("БПУ");
 }
 
 void MainWindow::createPlots()
@@ -59,23 +57,20 @@ void MainWindow::createPlots()
       double b = ui->lineEdit_2->text().toDouble();
       u0[i] = cos(a * t0[i]) + sin(b * t0[i]); // let's plot a quadratic function
     }
-    drawPlot(ui->customPlot, t0, u0, "t", "u");
+    drawPlot(false, ui->customPlot, t0, u0, "t", "u");
     Transform *transform;
     switch (ui->comboBox_2->currentIndex()) {
     case 0:
-        transform = new discreteWalshTransform();
+        transform = new DiscreteWalshTransform();
         break;
     case 1:
-        transform = new FFTWDIT();
-        break;
-    case 2:
-        transform = new FFTWDIF();
+        transform = new FastWalshTransform();
     }
     QVector<std::complex<double>> *data = transform->directTransform(u0);
-    drawPlot(ui->customPlot_2, t0, *data, "f", "u", true);
-    ui->customPlot_2->graph(0)->setLineStyle(QCPGraph::lsImpulse);
+
+    drawPlot(false, ui->customPlot_2, t0, *data, "f", "u", true);
     QVector<std::complex<double>> *original = transform->inverseTransform(*data);
-    drawPlot(ui->customPlot_3, t0, *original, "t", "u", false, true);
+    drawPlot(false, ui->customPlot_3, t0, *original, "t", "u", false, true);
     delete data;
     delete original;
 //    ui->tableWidget->setItem(log2(transform->getLastSize()) - 1, ui->comboBox_2->currentIndex() * 3,
@@ -86,20 +81,22 @@ void MainWindow::createPlots()
 //                             new QTableWidgetItem(QString::number(transform->getPowOperations())));
 }
 
-void drawPlot(QCustomPlot* plot, QVector<double> x, QVector<double> y, QString horizontalLabel, QString verticalLabel)
+void drawPlot(bool isImpulse, QCustomPlot* plot, QVector<double> x, QVector<double> y, QString horizontalLabel, QString verticalLabel)
 {
     plot->addGraph();
     plot->graph(0)->setData(x, y);
-    // give the axes some labels:
     plot->xAxis->setLabel(horizontalLabel);
     plot->yAxis->setLabel(verticalLabel);
-    // set axes ranges, so we see all data:
     plot->xAxis->setRange(*std::min_element(x.constBegin(), x.constEnd()), *std::max_element(x.constBegin(), x.constEnd()));
     plot->yAxis->setRange(*std::min_element(y.constBegin(), y.constEnd()), *std::max_element(y.constBegin(), y.constEnd()));
+    if (isImpulse)
+    {
+        plot->graph(0)->setLineStyle(QCPGraph::lsImpulse);
+    }
     plot->replot();
 }
 
-void drawPlot(QCustomPlot* plot, QVector<double> x, QVector<std::complex<double>> y, QString horizontalLabel, QString verticalLabel, bool amplitude, bool real)
+void drawPlot(bool isImpulse, QCustomPlot* plot, QVector<double> x, QVector<std::complex<double>> y, QString horizontalLabel, QString verticalLabel, bool amplitude, bool real)
 {
     QVector<double> *u;
     if (real)
@@ -121,7 +118,7 @@ void drawPlot(QCustomPlot* plot, QVector<double> x, QVector<std::complex<double>
             u = Transform::getPhase(y);
         }
     }
-    drawPlot(plot, x, *u, horizontalLabel, verticalLabel);
+    drawPlot(isImpulse, plot, x, *u, horizontalLabel, verticalLabel);
     delete u;
 }
 
