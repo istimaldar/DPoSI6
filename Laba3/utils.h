@@ -7,7 +7,7 @@ class Utils
 public:
     Utils();
     static short rademacherFunction(unsigned int k, double t);
-    static short *toBinary(unsigned int n, unsigned int r);
+    static unsigned short *toBinary(unsigned int n);
     static short walshFunction(unsigned int n, double t);
 };
 

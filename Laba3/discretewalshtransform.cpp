@@ -17,7 +17,9 @@ QVector<std::complex<double>> *DiscreteWalshTransform::directTransform(const QVe
         {
             (*result)[k] += std::complex<double>(data[i].real() * Utils::walshFunction(k, static_cast<double>(i) / data.size()), 0);
         }
+        qDebug() << data[k].real() << "----->" << (*result)[k].real();
     }
+    qDebug() << "--------------------------------";
     return result;
 }
 
@@ -42,6 +44,7 @@ QVector<std::complex<double>> *DiscreteWalshTransform::inverseTransform(const QV
             (*result)[i] += std::complex<double>(data[k].real() * Utils::walshFunction(k, static_cast<double>(i) / data.size()), 0);
         }
         (*result)[i] /= data.size();
+        qDebug() << data[i].real() << "----->" << (*result)[i].real();
     }
     return result;
 }
