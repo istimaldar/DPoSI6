@@ -11,7 +11,7 @@ Utils::Utils()
 
 short Utils::rademacherFunction(unsigned int k, double t)
 {
-    if (t >= 1 || t < 0) {
+    if (t > 1 || t < 0) {
         throw std::exception(); //TODO: Fix this shit
     }
     double x = std::sin((2 << (k - 1)) * M_PI * t);
