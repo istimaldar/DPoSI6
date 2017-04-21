@@ -2,7 +2,7 @@
 #include <utils.h>
 #include <QDebug>
 
-DiscreteWalshTransform::discreteWalshTransform()
+DiscreteWalshTransform::DiscreteWalshTransform()
 {
 
 }
