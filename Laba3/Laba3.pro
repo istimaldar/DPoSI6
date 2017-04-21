@@ -48,3 +48,4 @@ HEADERS  += mainwindow.h \
     fastwalshtransform.h
 
 FORMS    += mainwindow.ui
+

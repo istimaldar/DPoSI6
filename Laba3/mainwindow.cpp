@@ -68,9 +68,9 @@ void MainWindow::createPlots()
     }
     QVector<std::complex<double>> *data = transform->directTransform(u0);
 
-    drawPlot(false, ui->customPlot_2, t0, *data, "f", "u", true);
+    drawPlot(true, ui->customPlot_3, t0, *data, "f", "u", true);
     QVector<std::complex<double>> *original = transform->inverseTransform(*data);
-    drawPlot(false, ui->customPlot_3, t0, *original, "t", "u", false, true);
+    drawPlot(false, ui->customPlot_2, t0, *original, "t", "u", false, true);
     delete data;
     delete original;
 //    ui->tableWidget->setItem(log2(transform->getLastSize()) - 1, ui->comboBox_2->currentIndex() * 3,

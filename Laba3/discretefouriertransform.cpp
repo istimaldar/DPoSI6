@@ -14,7 +14,7 @@ QVector<std::complex<double>> * DiscreteFourierTransform::directTransform(const 
     powOperations = 0;
     QVector<std::complex<double>> *result = new QVector<std::complex<double>>(data.size());
     std::complex<double> e(exp(1.0), 0);
-    for(int k = 0;k<data.size();k++)
+    for(int k = 0; k < data.size(); k++)
     {
         std::complex<double> w = std::pow(e, -2. * std::complex<double>(0,1) * M_PI / static_cast<double>(data.size())); //W=e^(-2*pi*i/N)
         mulOpirations += 4;
