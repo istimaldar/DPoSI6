@@ -18,7 +18,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     setupInterface();
-    setWindowTitle("Преобразования Фурье");
+    setWindowTitle("Преобразования Уолша");
     connect(ui->createPlotsEvent,SIGNAL(triggered(bool)),this,SLOT(createPlots()));
 }
 
@@ -35,8 +35,8 @@ void MainWindow::setupInterface()
     ui->comboBox_2->setSizePolicy(QSizePolicy::Ignored,QSizePolicy::Fixed);
     ui->pushButton->setSizePolicy(QSizePolicy::Ignored,QSizePolicy::Fixed);
     ui->tableWidget->setRowCount(9);
-    ui->tableWidget->setColumnCount(9);
-    ui->tableWidget->setHorizontalHeaderLabels(QStringList() << "ДПФсл" << "ДПФум" << "ДПФст" << "БПФПВсл" << "БПФПВум" << "БПФПВст" << "БПФПЧсл" << "БПФПЧум" << "БПФПЧст");
+    ui->tableWidget->setColumnCount(6);
+    ui->tableWidget->setHorizontalHeaderLabels(QStringList() << "ДПУсл" << "ДПУум" << "ДПУст" << "БПУсл" << "БПУум" << "БПУст");
     ui->tableWidget->setVerticalHeaderLabels(QStringList() << "2" << "4" << "8" << "16" << "32" << "64" << "128" << "256" << "512");
     for(int i=1; i<10; i++)
     {
@@ -73,12 +73,12 @@ void MainWindow::createPlots()
     drawPlot(false, ui->customPlot_2, t0, *original, "t", "u", false, true);
     delete data;
     delete original;
-//    ui->tableWidget->setItem(log2(transform->getLastSize()) - 1, ui->comboBox_2->currentIndex() * 3,
-//                             new QTableWidgetItem(QString::number(transform->getAddOperations())));
-//    ui->tableWidget->setItem(log2(transform->getLastSize()) - 1, ui->comboBox_2->currentIndex() * 3 + 1,
-//                             new QTableWidgetItem(QString::number(transform->getMulOperations())));
-//    ui->tableWidget->setItem(log2(transform->getLastSize()) - 1, ui->comboBox_2->currentIndex() * 3 + 2,
-//                             new QTableWidgetItem(QString::number(transform->getPowOperations())));
+    ui->tableWidget->setItem(log2(transform->getLastSize()) - 1, ui->comboBox_2->currentIndex() * 3,
+                             new QTableWidgetItem(QString::number(transform->getAddOperations())));
+    ui->tableWidget->setItem(log2(transform->getLastSize()) - 1, ui->comboBox_2->currentIndex() * 3 + 1,
+                             new QTableWidgetItem(QString::number(transform->getMulOperations())));
+    ui->tableWidget->setItem(log2(transform->getLastSize()) - 1, ui->comboBox_2->currentIndex() * 3 + 2,
+                             new QTableWidgetItem(QString::number(transform->getPowOperations())));
 }
 
 void drawPlot(bool isImpulse, QCustomPlot* plot, QVector<double> x, QVector<double> y, QString horizontalLabel, QString verticalLabel)

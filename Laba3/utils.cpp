@@ -3,6 +3,7 @@
 #include <cmath>
 #include <QDebug>
 #include <iostream>
+#define MINIMAL_OFFSET 0.0000000001
 
 Utils::Utils()
 {
@@ -14,7 +15,7 @@ short Utils::rademacherFunction(unsigned int k, double t)
     if (t > 1 || t < 0) {
         throw std::exception(); //TODO: Fix this shit
     }
-    double x = std::sin((2 << (k  - 1)) * M_PI * (t + 0.0000001)); //TODO: Get rid of this shit
+    double x = std::sin((2 << (k  - 1)) * M_PI * (t + MINIMAL_OFFSET));
     return (x < 0) ? -1 : 1;
 }
 

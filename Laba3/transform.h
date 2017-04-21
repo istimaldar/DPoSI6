@@ -2,6 +2,7 @@
 #define TRANSFORM_H
 #include <QVector>
 #include <complex>
+#include <string>
 
 class Transform
 {

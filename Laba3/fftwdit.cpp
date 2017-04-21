@@ -31,7 +31,7 @@ QVector<std::complex<double>> *FFTWDIT::fastTransform(const QVector<std::complex
     std::complex<double> e(exp(1.0), 0);
     std::complex<double> wn = std::pow(e, (direction ? -2. : 2.) * std::complex<double>(0,1) * M_PI / static_cast<double>(data.size()));
     std::complex<double> w(1, 0);
-    if (direction) mulOpirations += 4;
+    if (direction) mulOpirations += 3;
     if (direction) powOperations += 1;
     QVector<std::complex<double>> *y = new QVector<std::complex<double>>(data.size());
     for (int i = 0;i<data.size()/2;i++)

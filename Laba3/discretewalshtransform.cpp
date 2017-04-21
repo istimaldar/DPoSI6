@@ -15,16 +15,19 @@ QVector<std::complex<double>> *DiscreteWalshTransform::directTransform(const QVe
         (*result)[k] = std::complex<double>(0, 0);
         for (int i = 0; i < data.size(); i++)
         {
-            (*result)[k] += std::complex<double>(data[i].real() * Utils::walshFunction(Utils::walshToAdamar(k, data.size()), (static_cast<double>(i) + 1 - 1) / data.size()), 0);
+            (*result)[k] += std::complex<double>(data[i].real() * Utils::walshFunction(Utils::walshToAdamar(k, data.size()), static_cast<double>(i) / data.size()), 0);
+            mulOpirations += 1;
         }
-        qDebug() << k << "----->" << data[k].real();
     }
-    qDebug() << "--------------------------------";
     return result;
 }
 
 QVector<std::complex<double> > *DiscreteWalshTransform::directTransform(const QVector<double> &data)
 {
+    lastSize = data.size();
+    addOperations = 0;
+    mulOpirations = 0;
+    powOperations = 0;
     QVector<std::complex<double>> u(data.size());
     for (int i = 0;i<data.size();i++)
     {
@@ -41,10 +44,9 @@ QVector<std::complex<double>> *DiscreteWalshTransform::inverseTransform(const QV
         (*result)[i] = std::complex<double>(0, 0);
         for (int k = 0; k < data.size(); k++)
         {
-            (*result)[i] += std::complex<double>(data[k].real() * Utils::walshFunction(Utils::walshToAdamar(k, data.size()), (static_cast<double>(i) + 1 - 1) / data.size()), 0);
+            (*result)[i] += std::complex<double>(data[k].real() * Utils::walshFunction(Utils::walshToAdamar(k, data.size()), static_cast<double>(i) / data.size()), 0);
         }
         (*result)[i] /= data.size();
-        qDebug() << i << "----->" << (*result)[i].real();
     }
     return result;
 }

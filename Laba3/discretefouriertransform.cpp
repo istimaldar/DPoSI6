@@ -59,3 +59,8 @@ QVector<std::complex<double>> *DiscreteFourierTransform::inverseTransform(const 
     }
     return result;
 }
+
+QVector<std::complex<double> > *DiscreteFourierTransform::fastTransform(const QVector<std::complex<double> > &data, bool direction)
+{
+
+}

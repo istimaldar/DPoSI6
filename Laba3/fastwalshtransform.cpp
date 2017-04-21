@@ -20,23 +20,28 @@ QVector<std::complex<double> > *FastWalshTransform::directTransform(const QVecto
     {
         (*first)[i] = data[i] + data[newVectorSize + i];
         (*last)[i] = data[i] - data[newVectorSize + i];
+        addOperations += 2;
     }
     QVector<std::complex<double>> *firstResult = directTransform(*first);
-    //delete first;
+    delete first;
     QVector<std::complex<double>> *lastResult = directTransform(*last);
-    //delete last;
+    delete last;
     QVector<std::complex<double>> *result = new QVector<std::complex<double>>(data.size());
     for (int i = 0; i < newVectorSize; i++)
     {
         (*result)[i] = (*firstResult)[i];
         (*result)[newVectorSize + i] = (*lastResult)[i];
     }
-    //delete lastResult;
+    delete lastResult;
     return result;
 }
 
 QVector<std::complex<double> > *FastWalshTransform::directTransform(const QVector<double> &data)
 {
+    lastSize = data.size();
+    addOperations = 0;
+    mulOpirations = 0;
+    powOperations = 0;
     QVector<std::complex<double>> u(data.size());
     for (int i = 0;i<data.size();i++)
     {
@@ -53,4 +58,9 @@ QVector<std::complex<double> > *FastWalshTransform::inverseTransform(const QVect
         (*result)[i] /= std::complex<double>(data.size(), 0);
     }
     return result;
+}
+
+QVector<std::complex<double> > *FastWalshTransform::fastTransform(const QVector<std::complex<double> > &data, bool direction)
+{
+
 }
