@@ -8,6 +8,7 @@ class Filter
 {
 public:
     Filter();
+    static QVector<double> *genereteFilterFunction(unsigned int size, unsigned int M, double f);
     static QVector<double> *lowPassFilter(const QVector<double> &data, unsigned int M, unsigned int f, Transform *transform);
     static QVector<std::complex<double>> *lowPassFilterFrequencyDomain(const QVector<double> &data, unsigned int M, unsigned int f, Transform *transform);
     static QVector<double> *highPassFilter(const QVector<double> &data, unsigned int M, unsigned int f, Transform *transform);

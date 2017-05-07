@@ -52,38 +52,22 @@ void MainWindow::setupInterface()
 void MainWindow::createPlots()
 {
     int numberOfPoints = ui->comboBox->currentText().toInt();
+    numberOfPoints = 64; //TODO: Remove in final
     QVector<double> t0(numberOfPoints), u0(numberOfPoints); // initialize with entries 0..100
-    for (int i=0; i<numberOfPoints; i++)
+    QVector<double> *temp = Filter::genereteFilterFunction(64, 50, 0.2);;
+    for (int i = 0; i < numberOfPoints; i++)
     {
-      t0[i] = (8. * i / numberOfPoints); // x goes from -1 to 1
+      t0[i] = i; // x goes from -1 to 1
       double a = ui->lineEdit->text().toDouble();
       double b = ui->lineEdit_2->text().toDouble();
-      u0[i] = std::sin(2 * M_PI * 4 * (i + 1)) / (M_PI * (i + 1));//cos(a * t0[i]) + sin(b * t0[i]); // let's plot a quadratic function
+      u0[i] = (*temp)[i];
+      //cos(a * t0[i]) + sin(b * t0[i]); // let's plot a quadratic function
     }
+    delete temp;
     drawPlot(ui->customPlot, t0, u0, "t", "u");
-    QVector<double> *data = Filter::lowPassFilter(u0, 480, 4, FFTWDIF::getInstance());
-    //QVector<std::complex<double>> *data2 = Filter::blackmansWindow(*data, 50, FFTWDIF::getInstance());
-    QVector<std::complex<double>> *data3 = FFTWDIF::getInstance()->directTransform(u0);
-    //data2 = Filter::normalize(*data2); //TODO: Fix memory leak
-    //QVector<std::complex<double>> *data4 = Filter::highPhssFilterFrequencyDomain(u0, 480, 4, FFTWDIF::getInstance());
-    //data4 = Filter::normalize(*data4); // TODO: Fix memory leak
-//    QVector<std::complex<double>> *data = transform->directTransform(u0);
-    //drawFreqPlot(ui->customPlot_2, *data2);
-    drawFreqPlot(ui->customPlot_3, *data3);
-    //drawFreqPlot(ui->customPlot_4, *data4);
-//    drawPlot(ui->customPlot_3, t0, *data, "f", "phi", false);
-//    ui->customPlot_2->graph(0)->setLineStyle(QCPGraph::lsImpulse);
-//    ui->customPlot_3->graph(0)->setLineStyle(QCPGraph::lsImpulse);
-//    QVector<std::complex<double>> *original = transform->inverseTransform(*data);
-//    drawPlot(ui->customPlot_4, t0, *original, "t", "u", false, true);
-//    delete data;
-//    delete original;
-//    ui->tableWidget->setItem(log2(transform->getLastSize()) - 1, ui->comboBox_2->currentIndex() * 3,
-//                             new QTableWidgetItem(QString::number(transform->getAddOperations())));
-//    ui->tableWidget->setItem(log2(transform->getLastSize()) - 1, ui->comboBox_2->currentIndex() * 3 + 1,
-//                             new QTableWidgetItem(QString::number(transform->getMulOperations())));
-//    ui->tableWidget->setItem(log2(transform->getLastSize()) - 1, ui->comboBox_2->currentIndex() * 3 + 2,
-//                             new QTableWidgetItem(QString::number(transform->getPowOperations())));
+    QVector<std::complex<double>> *data = DiscreteFourierTransform::getInstance()->directTransform(u0);
+    drawFreqPlot(ui->customPlot_2, *data);
+    //delete &u0;
 }
 
 void drawFreqPlot(QCustomPlot* plot, QVector<std::complex<double>> y)

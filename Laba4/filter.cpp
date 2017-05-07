@@ -10,8 +10,23 @@ Filter::Filter()
 QVector<double> *Filter::genereteFilterFunction(unsigned int size, unsigned int M, double f)
 {
     QVector<double> *result = new QVector<double>(size);
-    (*result)[0] = 1;
-    for (int i = 1; i < M; i++)
+    for (int i = 0; i <= M; i++)
+    {
+        int n = i - M / 2;
+        if (n != 0)
+        {
+            (*result)[i] = std::sin(2 * M_PI * f * n) / (M_PI * n);
+        }
+        else
+        {
+            (*result)[i] = 1;
+        }
+    }
+    for (int i = M + 1; i < size; i++)
+    {
+        (*result)[i] = 0;
+    }
+    return result;
 }
 
 QVector<double> *Filter::lowPassFilter(const QVector<double> &data, unsigned int M, unsigned int f, Transform *transform)
