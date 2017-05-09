@@ -10,6 +10,8 @@
 #include <QStringList>
 #include "filter.h"
 #include <iostream>
+#include "recursivefilter.h"
+#include <QMessageBox>
 
 void drawPlot(QCustomPlot* plot, QVector<double> x, QVector<double> y, QString horizontalLabel = "x", QString verticalLabel = "y");
 void drawPlot(QCustomPlot* plot, QVector<double> x, QVector<std::complex<double>> y, QString horizontalLabel = "x", QString verticalLabel = "y", bool amplitude=true, bool real=false);
@@ -35,52 +37,78 @@ void MainWindow::setupInterface()
     ui->lineEdit->setSizePolicy(QSizePolicy::Ignored,QSizePolicy::Fixed);
     ui->lineEdit_2->setSizePolicy(QSizePolicy::Ignored,QSizePolicy::Fixed);
     ui->comboBox->setSizePolicy(QSizePolicy::Ignored,QSizePolicy::Fixed);
-    ui->comboBox_2->setSizePolicy(QSizePolicy::Ignored,QSizePolicy::Fixed);
     ui->pushButton->setSizePolicy(QSizePolicy::Ignored,QSizePolicy::Fixed);
-    ui->tableWidget->setRowCount(9);
-    ui->tableWidget->setColumnCount(9);
-    ui->tableWidget->setHorizontalHeaderLabels(QStringList() << "ДПФсл" << "ДПФум" << "ДПФст" << "БПФПВсл" << "БПФПВум" << "БПФПВст" << "БПФПЧсл" << "БПФПЧум" << "БПФПЧст");
-    ui->tableWidget->setVerticalHeaderLabels(QStringList() << "2" << "4" << "8" << "16" << "32" << "64" << "128" << "256" << "512");
-    for(int i=1; i<10; i++)
+    ui->lineEdit_3->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
+    for(int i=1; i<12; i++)
     {
         ui->comboBox->addItem(QString::number(pow(2, i)));
     }
-    ui->comboBox_2->addItem("ДПФ");
-    ui->comboBox_2->addItem("БПФ с прореживанием по времени");
-    ui->comboBox_2->addItem("БПФ с прореживанием по частоте");
 }
 
 void MainWindow::createPlots()
 {
     int numberOfPoints = ui->comboBox->currentText().toInt();
-    numberOfPoints = 128; //TODO: Remove in final
-    QVector<double> t0(numberOfPoints), u0(numberOfPoints); // initialize with entries 0..100
+    int M = ui->lineEdit_3->text().toInt();
+    if (M > numberOfPoints || M <= 0)
+    {
+        QMessageBox messageBox;
+        messageBox.critical(0,"Error","M must be less or equal then number of points anf greather then 0.");
+        messageBox.setFixedSize(500,200);
+        return;
+    }
+    QVector<double> t0(numberOfPoints), u0(numberOfPoints);
     for (int i = 0; i < numberOfPoints; i++)
     {
-      t0[i] = (8. * i / numberOfPoints); // x goes from -1 to 1
+      t0[i] = (16. * i / numberOfPoints); // x goes from -1 to 1
       double a = ui->lineEdit->text().toDouble();
       double b = ui->lineEdit_2->text().toDouble();
-      u0[i] = cos(a * t0[i]) + sin(b * t0[i]); // let's plot a quadratic function
+      u0[i] = cos(a * t0[i]) + sin(b * t0[i]);
+      u0[i] += sin(80  * t0[i]);
+      u0[i] += sin(0.1  * t0[i]);
+      u0[i] += 0.3;
     }
     //delete temp;
-    drawPlot(ui->customPlot, t0, u0, "t", "u");
-    QVector<double> *impulseResponseHF = Filter::buildHighFrequencyIR(128, 100, 0.3);
-    QVector<double> *blackmanssWindowHF = Filter::blackmansWindow(*impulseResponseHF, 100);
-    QVector<double> *impulseResponseLF = Filter::buildLowFrequencyIR(128, 100, 0.1);
-    QVector<double> *blackmanssWindowLF = Filter::blackmansWindow(*impulseResponseLF, 100);
-    //delete impulseResponseHF;
-    //delete impulseResponseLF;
+    drawPlot(ui->customPlot_5, t0, u0, "t", "u");
+    double fl = ui->lineEdit_4->text().toDouble();
+    if (fl <= 0|| fl > 0.5)
+    {
+        QMessageBox messageBox;
+        messageBox.critical(0,"Error","Wrong low freq");
+        messageBox.setFixedSize(500,200);
+        return;
+    }
+    double fh = ui->lineEdit_5->text().toDouble();
+    if (fh <= 0|| fh > 0.5 || fh <= fl)
+    {
+        QMessageBox messageBox;
+        messageBox.critical(0,"Error","Wrong high freq");
+        messageBox.setFixedSize(500,200);
+        return;
+    }
+    QVector<double> *impulseResponseHF = Filter::buildHighFrequencyIR(numberOfPoints, M, fh);
+    QVector<double> *blackmanssWindowHF = Filter::blackmansWindow(*impulseResponseHF, M);
+    QVector<double> *impulseResponseLF = Filter::buildLowFrequencyIR(numberOfPoints, M, fl);
+    QVector<double> *blackmanssWindowLF = Filter::blackmansWindow(*impulseResponseLF, M);
+    delete impulseResponseHF;
+    delete impulseResponseLF;
     QVector<double> *impulseResponse = Filter::buildBandPassIR(*blackmanssWindowLF, *blackmanssWindowHF, DiscreteFourierTransform::getInstance());
-    //delete impulseResponseHF;
-    //delete impulseResponseLF;
+    delete blackmanssWindowHF;
+    delete blackmanssWindowLF;
     QVector<double> *timeData = Filter::filter(u0, 100, 0.1, DiscreteFourierTransform::getInstance(), *impulseResponse);
-    //delete blackmanssWindow;
-    //QVector<double> *timeData1 = Filter::genereteFilterFunction(128, 100, 0.1);
     QVector<std::complex<double>> *data = DiscreteFourierTransform::getInstance()->directTransform(*timeData);
     QVector<std::complex<double>> *data1 = DiscreteFourierTransform::getInstance()->directTransform(u0);
-    QVector<double> *inverse = DiscreteFourierTransform::getInstance()->inverseTransform(*data1);
-    drawFreqPlot(ui->customPlot_4, *data);
-    drawFreqPlot(ui->customPlot_3, *data1);
+    double x = ui->lineEdit_6->text().toDouble();
+    if (x >= 1)
+    {
+        QMessageBox messageBox;
+        messageBox.critical(0,"Error","Wrong x");
+        messageBox.setFixedSize(500,200);
+        return;
+    }
+    QVector<double> *finalData = RecursiveFilter::filter(*timeData, x);
+    drawFreqPlot(ui->customPlot, *data1);
+    drawFreqPlot(ui->customPlot_2, *data);
+    drawPlot(ui->customPlot_3, t0, *timeData, "t", "u");
     double difference = 0;
     for (unsigned int i = 0; i < timeData->size() / 10; i++)
     {
@@ -91,7 +119,7 @@ void MainWindow::createPlots()
     difference /= timeData->size() * 10;
     std::cout << difference << std::endl;
     //drawPlot(ui->customPlot_3, t0, *timeData1, "t", "u");
-    drawPlot(ui->customPlot_2, t0, *timeData, "t", "u");
+    drawPlot(ui->customPlot_4, t0, *finalData, "t", "u");
     //drawPlot(ui->customPlot_4, t0, *inverse, "t", "u");
     //delete &u0;
 }

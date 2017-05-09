@@ -36,7 +36,8 @@ SOURCES += main.cpp\
     operationwithtwooperands.cpp \
     convolution.cpp \
     correlation.cpp \
-    filter.cpp
+    filter.cpp \
+    recursivefilter.cpp
 
 HEADERS  += mainwindow.h \
     discretefouriertransform.h \
@@ -47,6 +48,7 @@ HEADERS  += mainwindow.h \
     operationwithtwooperands.h \
     convolution.h \
     correlation.h \
-    filter.h
+    filter.h \
+    recursivefilter.h
 
 FORMS    += mainwindow.ui

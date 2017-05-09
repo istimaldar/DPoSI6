@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>830</width>
-    <height>578</height>
+    <height>611</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -26,12 +26,18 @@
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
+         <widget class="QCustomPlot" name="customPlot_5" native="true"/>
+        </item>
+        <item>
          <layout class="QHBoxLayout" name="horizontalLayout">
           <item>
            <widget class="QCustomPlot" name="customPlot" native="true"/>
           </item>
           <item>
-           <widget class="QCustomPlot" name="customPlot_2" native="true"/>
+           <widget class="QCustomPlot" name="customPlot_2" native="true">
+            <zorder></zorder>
+            <zorder>customPlot</zorder>
+           </widget>
           </item>
          </layout>
         </item>
@@ -41,23 +47,16 @@
            <widget class="QCustomPlot" name="customPlot_3" native="true"/>
           </item>
           <item>
-           <widget class="QCustomPlot" name="customPlot_4" native="true"/>
+           <widget class="QCustomPlot" name="customPlot_4" native="true">
+            <zorder>customPlot_3</zorder>
+           </widget>
           </item>
          </layout>
         </item>
        </layout>
        <zorder></zorder>
        <zorder></zorder>
-      </widget>
-      <widget class="QWidget" name="tab_2">
-       <attribute name="title">
-        <string>Количество операций</string>
-       </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_2">
-        <item>
-         <widget class="QTableWidget" name="tableWidget"/>
-        </item>
-       </layout>
+       <zorder>customPlot_5</zorder>
       </widget>
      </widget>
     </item>
@@ -107,12 +106,64 @@
       <item>
        <widget class="QLabel" name="label_5">
         <property name="text">
-         <string>Алгоритм ПФ</string>
+         <string>M:</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QComboBox" name="comboBox_2"/>
+       <widget class="QLineEdit" name="lineEdit_3"/>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_10">
+      <item>
+       <widget class="QLabel" name="label_7">
+        <property name="text">
+         <string>Параметры первого фильтра</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_6">
+        <property name="text">
+         <string>fl:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="lineEdit_4"/>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_8">
+        <property name="text">
+         <string>fh:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="lineEdit_5"/>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_11">
+      <item>
+       <widget class="QLabel" name="label_9">
+        <property name="text">
+         <string>Параметры второго фильтра:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_10">
+        <property name="text">
+         <string>x:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="lineEdit_6"/>
       </item>
      </layout>
     </item>
