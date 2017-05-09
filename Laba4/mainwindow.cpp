@@ -52,21 +52,28 @@ void MainWindow::setupInterface()
 void MainWindow::createPlots()
 {
     int numberOfPoints = ui->comboBox->currentText().toInt();
-    numberOfPoints = 64; //TODO: Remove in final
+    numberOfPoints = 256; //TODO: Remove in final
     QVector<double> t0(numberOfPoints), u0(numberOfPoints); // initialize with entries 0..100
-    QVector<double> *temp = Filter::genereteFilterFunction(64, 50, 0.2);;
     for (int i = 0; i < numberOfPoints; i++)
     {
-      t0[i] = i; // x goes from -1 to 1
+      t0[i] = (8. * i / numberOfPoints); // x goes from -1 to 1
       double a = ui->lineEdit->text().toDouble();
       double b = ui->lineEdit_2->text().toDouble();
-      u0[i] = (*temp)[i];
-      //cos(a * t0[i]) + sin(b * t0[i]); // let's plot a quadratic function
+      u0[i] = cos(a * t0[i]) + sin(b * t0[i]); // let's plot a quadratic function
     }
-    delete temp;
+    //delete temp;
     drawPlot(ui->customPlot, t0, u0, "t", "u");
-    QVector<std::complex<double>> *data = DiscreteFourierTransform::getInstance()->directTransform(u0);
+    QVector<double> *impulseResponse = Filter::genereteFilterFunction(256, 200, 0.1);
+    QVector<double> *blackmanssWindow = Filter::blackmansWindow(*impulseResponse, 200, DiscreteFourierTransform::getInstance());
+    QVector<double> *timeData = Filter::lowPassFilter(u0, 200, 0.1, DiscreteFourierTransform::getInstance(), *blackmanssWindow);
+    delete impulseResponse;
+    QVector<double> *timeData1 = Filter::genereteFilterFunction(256, 200, 0.1);
+    QVector<std::complex<double>> *data = DiscreteFourierTransform::getInstance()->directTransform(*timeData);
+    QVector<std::complex<double>> *data1 = DiscreteFourierTransform::getInstance()->directTransform(u0);
     drawFreqPlot(ui->customPlot_2, *data);
+    drawFreqPlot(ui->customPlot_3, *data1);
+    //drawPlot(ui->customPlot_3, t0, *timeData1, "t", "u");
+    drawPlot(ui->customPlot_4, t0, *timeData, "t", "u");
     //delete &u0;
 }
 

@@ -9,6 +9,10 @@ Filter::Filter()
 
 QVector<double> *Filter::genereteFilterFunction(unsigned int size, unsigned int M, double f)
 {
+//    if (M % 2 != 0)
+//    {
+//        M += 1;
+//    }
     QVector<double> *result = new QVector<double>(size);
     for (int i = 0; i <= M; i++)
     {
@@ -29,22 +33,9 @@ QVector<double> *Filter::genereteFilterFunction(unsigned int size, unsigned int 
     return result;
 }
 
-QVector<double> *Filter::lowPassFilter(const QVector<double> &data, unsigned int M, unsigned int f, Transform *transform)
+QVector<double> *Filter::lowPassFilter(const QVector<double> &data, unsigned int M, unsigned int f, Transform *transform, const QVector<double> &impulseResponse)
 {
-    if (M % 2 != 0)
-    {
-        M += 1;
-    }
-    QVector<double> filterFunction(data.size());
-    for (int i = 0; i <= M; i++)
-    {
-        filterFunction[i] = std::sin(2 * M_PI * f * (i + 1)) / (M_PI * (i + 1));
-    }
-    for (int i = M + 1; i < data.size(); i++)
-    {
-        filterFunction[i] = 0;
-    }
-    QVector<std::complex<double>> *vector = Convolution::getInstance()->execute(data, filterFunction, *(transform));
+    QVector<std::complex<double>> *vector = Convolution::getInstance()->execute(data, impulseResponse, *(transform));
     QVector<double> *result = new QVector<double>(vector->size());
     for (int i = 0; i < vector->size(); i++)
     {
@@ -56,9 +47,9 @@ QVector<double> *Filter::lowPassFilter(const QVector<double> &data, unsigned int
 
 
 
-QVector<std::complex<double> > *Filter::lowPassFilterFrequencyDomain(const QVector<double> &data, unsigned int M, unsigned int f, Transform *transform)
+QVector<std::complex<double> > *Filter::lowPassFilterFrequencyDomain(const QVector<double> &data, unsigned int M, unsigned int f, Transform *transform, const QVector<double> &impulseResponse)
 {
-    QVector<double> *vector = lowPassFilter(data, M, f, transform);
+    QVector<double> *vector = lowPassFilter(data, M, f, transform, impulseResponse);
     QVector<std::complex<double>> *result = transform->directTransform((*vector));
     delete vector;
     return result;
@@ -97,7 +88,7 @@ QVector<std::complex<double> > *Filter::highPhssFilterFrequencyDomain(const QVec
     return result;
 }
 
-QVector<std::complex<double> > *Filter::blackmansWindow(const QVector<double> &data, unsigned int M, Transform *transform)
+QVector<double> *Filter::blackmansWindow(const QVector<double> &data, unsigned int M, Transform *transform)
 {
     QVector<double> vector(data.size());
     for (int i = 0; i <= M; i++)
@@ -108,12 +99,11 @@ QVector<std::complex<double> > *Filter::blackmansWindow(const QVector<double> &d
     {
         vector[i] = 0;
     }
-    QVector<double> resultTimeDomain(data.size());
+    QVector<double> *result = new QVector<double>(data.size());
     for (int i = 0; i < data.size(); i++)
     {
-        resultTimeDomain[i] = data[i] * vector[i];
+        (*result)[i] = data[i] * vector[i];
     }
-    QVector<std::complex<double> > *result = transform->directTransform(resultTimeDomain);
     return result;
 }
 
