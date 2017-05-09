@@ -64,11 +64,17 @@ void MainWindow::createPlots()
     }
     //delete temp;
     drawPlot(ui->customPlot, t0, u0, "t", "u");
-    QVector<double> *impulseResponse = Filter::buildHighFrequencyIR(128, 100, 0.1);
-    QVector<double> *blackmanssWindow = Filter::blackmansWindow(*impulseResponse, 100);
-    delete impulseResponse;
-    QVector<double> *timeData = Filter::lowPassFilter(u0, 100, 0.1, DiscreteFourierTransform::getInstance(), *blackmanssWindow);
-    delete blackmanssWindow;
+    QVector<double> *impulseResponseHF = Filter::buildHighFrequencyIR(128, 100, 0.3);
+    QVector<double> *blackmanssWindowHF = Filter::blackmansWindow(*impulseResponseHF, 100);
+    QVector<double> *impulseResponseLF = Filter::buildLowFrequencyIR(128, 100, 0.1);
+    QVector<double> *blackmanssWindowLF = Filter::blackmansWindow(*impulseResponseLF, 100);
+    //delete impulseResponseHF;
+    //delete impulseResponseLF;
+    QVector<double> *impulseResponse = Filter::buildBandPassIR(*blackmanssWindowLF, *blackmanssWindowHF, DiscreteFourierTransform::getInstance());
+    //delete impulseResponseHF;
+    //delete impulseResponseLF;
+    QVector<double> *timeData = Filter::filter(u0, 100, 0.1, DiscreteFourierTransform::getInstance(), *impulseResponse);
+    //delete blackmanssWindow;
     //QVector<double> *timeData1 = Filter::genereteFilterFunction(128, 100, 0.1);
     QVector<std::complex<double>> *data = DiscreteFourierTransform::getInstance()->directTransform(*timeData);
     QVector<std::complex<double>> *data1 = DiscreteFourierTransform::getInstance()->directTransform(u0);

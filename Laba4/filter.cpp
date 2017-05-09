@@ -64,7 +64,14 @@ QVector<double> *Filter::buildHighFrequencyIR(unsigned int size, unsigned int M,
     return result;
 }
 
-QVector<double> *Filter::lowPassFilter(const QVector<double> &data, unsigned int M, unsigned int f, Transform *transform, const QVector<double> &impulseResponse)
+
+QVector<double> *Filter::buildBandPassIR(QVector<double> &lowPass, QVector<double> &highPass, Transform *transform)
+{
+    QVector<double> *result = Convolution::getInstance()->execute(lowPass, highPass, *transform);
+    return result;
+}
+
+QVector<double> *Filter::filter(const QVector<double> &data, unsigned int M, unsigned int f, Transform *transform, const QVector<double> &impulseResponse)
 {
     QVector<double> *result = Convolution::getInstance()->execute(data, impulseResponse, *(transform));
     return result;
@@ -72,47 +79,12 @@ QVector<double> *Filter::lowPassFilter(const QVector<double> &data, unsigned int
 
 
 
-QVector<std::complex<double> > *Filter::lowPassFilterFrequencyDomain(const QVector<double> &data, unsigned int M, unsigned int f, Transform *transform, const QVector<double> &impulseResponse)
+QVector<std::complex<double> > *Filter::filterFrequencyDomain(const QVector<double> &data, unsigned int M, unsigned int f, Transform *transform, const QVector<double> &impulseResponse)
 {
-    QVector<double> *vector = lowPassFilter(data, M, f, transform, impulseResponse);
+    QVector<double> *vector = filter(data, M, f, transform, impulseResponse);
     QVector<std::complex<double>> *result = transform->directTransform((*vector));
     delete vector;
     return result;
-}
-
-QVector<double> *Filter::highPassFilter(const QVector<double> &data, unsigned int M, unsigned int f, Transform *transform)
-{
-//    if (M % 2 != 0)
-//    {
-//        M += 1;
-//    }
-//    QVector<double> filterFunction(data.size());
-//    for (int i = 0; i <= M; i++)
-//    {
-//        filterFunction[i] = 0 - std::sin(2 * M_PI * f * (i + 1)) / (M_PI * (i + 1));
-//    }
-//    for (int i = M + 1; i < data.size(); i++)
-//    {
-//        filterFunction[i] = 0;
-//    }
-//    QVector<std::complex<double>> *vector = Convolution::getInstance()->execute(data, filterFunction, *(transform));
-//    QVector<double> *result = new QVector<double>(vector->size());
-//    for (int i = 0; i < vector->size(); i++)
-//    {
-//        (*result)[i] = (*vector)[i].real();
-//    }
-//    delete vector;
-//    return result;
-    return nullptr;
-}
-
-QVector<std::complex<double> > *Filter::highPhssFilterFrequencyDomain(const QVector<double> &data, unsigned int M, unsigned int f, Transform *transform)
-{
-//    QVector<double> *vector = highPassFilter(data, M, f, transform);
-//    QVector<std::complex<double>> *result = transform->directTransform((*vector));
-//    delete vector;
-//    return result;
-    return nullptr;
 }
 
 QVector<double> *Filter::blackmansWindow(const QVector<double> &data, unsigned int M)
@@ -153,16 +125,4 @@ QVector<std::complex<double> > *Filter::normalize(const QVector<std::complex<dou
     return result;
 }
 
-QVector<std::complex<double> > *Filter::bandPassFilter(QVector<std::complex<double> > &lowPass, QVector<std::complex<double> > &highPass, Transform *transform)
-{
-//    QVector<std::complex<double> > *lowPassTimeDomain = transform->inverseTransform(lowPass);
-//    QVector<std::complex<double> > *highPassTimeDomain = transform->inverseTransform(highPass);
-//    QVector<std::complex<double> > *bandPassTimeDomain = Convolution::getInstance()->execute((*lowPassTimeDomain), (*highPassTimeDomain), (*transform));
-//    delete lowPassTimeDomain;
-//    delete highPassTimeDomain;
-//    QVector<std::complex<double>> *result = transform->directTransform((*bandPassTimeDomain));
-//    delete bandPassTimeDomain;
-//    return result;
-    return nullptr;
-}
 
