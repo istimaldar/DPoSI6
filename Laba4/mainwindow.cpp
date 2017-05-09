@@ -9,6 +9,7 @@
 #include "fftwdif.h"
 #include <QStringList>
 #include "filter.h"
+#include <iostream>
 
 void drawPlot(QCustomPlot* plot, QVector<double> x, QVector<double> y, QString horizontalLabel = "x", QString verticalLabel = "y");
 void drawPlot(QCustomPlot* plot, QVector<double> x, QVector<std::complex<double>> y, QString horizontalLabel = "x", QString verticalLabel = "y", bool amplitude=true, bool real=false);
@@ -52,7 +53,7 @@ void MainWindow::setupInterface()
 void MainWindow::createPlots()
 {
     int numberOfPoints = ui->comboBox->currentText().toInt();
-    numberOfPoints = 256; //TODO: Remove in final
+    numberOfPoints = 128; //TODO: Remove in final
     QVector<double> t0(numberOfPoints), u0(numberOfPoints); // initialize with entries 0..100
     for (int i = 0; i < numberOfPoints; i++)
     {
@@ -63,17 +64,29 @@ void MainWindow::createPlots()
     }
     //delete temp;
     drawPlot(ui->customPlot, t0, u0, "t", "u");
-    QVector<double> *impulseResponse = Filter::genereteFilterFunction(256, 200, 0.1);
-    QVector<double> *blackmanssWindow = Filter::blackmansWindow(*impulseResponse, 200, DiscreteFourierTransform::getInstance());
-    QVector<double> *timeData = Filter::lowPassFilter(u0, 200, 0.1, DiscreteFourierTransform::getInstance(), *blackmanssWindow);
+    QVector<double> *impulseResponse = Filter::buildHighFrequencyIR(128, 100, 0.1);
+    QVector<double> *blackmanssWindow = Filter::blackmansWindow(*impulseResponse, 100);
     delete impulseResponse;
-    QVector<double> *timeData1 = Filter::genereteFilterFunction(256, 200, 0.1);
+    QVector<double> *timeData = Filter::lowPassFilter(u0, 100, 0.1, DiscreteFourierTransform::getInstance(), *blackmanssWindow);
+    delete blackmanssWindow;
+    //QVector<double> *timeData1 = Filter::genereteFilterFunction(128, 100, 0.1);
     QVector<std::complex<double>> *data = DiscreteFourierTransform::getInstance()->directTransform(*timeData);
     QVector<std::complex<double>> *data1 = DiscreteFourierTransform::getInstance()->directTransform(u0);
-    drawFreqPlot(ui->customPlot_2, *data);
+    QVector<double> *inverse = DiscreteFourierTransform::getInstance()->inverseTransform(*data1);
+    drawFreqPlot(ui->customPlot_4, *data);
     drawFreqPlot(ui->customPlot_3, *data1);
+    double difference = 0;
+    for (unsigned int i = 0; i < timeData->size() / 10; i++)
+    {
+        double real = ((*data1)[i] / (*data)[i]).real();
+        double imag = ((*data1)[i] / (*data)[i]).imag();
+        difference += std::sqrt(real * real + imag * imag);
+    }
+    difference /= timeData->size() * 10;
+    std::cout << difference << std::endl;
     //drawPlot(ui->customPlot_3, t0, *timeData1, "t", "u");
-    drawPlot(ui->customPlot_4, t0, *timeData, "t", "u");
+    drawPlot(ui->customPlot_2, t0, *timeData, "t", "u");
+    //drawPlot(ui->customPlot_4, t0, *inverse, "t", "u");
     //delete &u0;
 }
 

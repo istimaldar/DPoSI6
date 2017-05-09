@@ -7,7 +7,7 @@ Correlation::Correlation()
 
 }
 
-QVector<std::complex<double> > *Correlation::execute(const QVector<std::complex<double> > &first, const QVector<std::complex<double> > &second, Transform &transform)
+QVector<double> *Correlation::execute(const QVector<std::complex<double> > &first, const QVector<std::complex<double> > &second, Transform &transform)
 {
     QVector<std::complex<double>> *cx = transform.directTransform(first);
     QVector<std::complex<double>> *cy = transform.directTransform(second);
@@ -18,12 +18,12 @@ QVector<std::complex<double> > *Correlation::execute(const QVector<std::complex<
         transform.addMulOperations(1);
         transform.addAddOperations(1);
     }
-    QVector<std::complex<double>> *x = transform.inverseTransform((*c));
+    QVector<double> *x = transform.inverseTransform((*c));
     delete c;
     return x;
 }
 
-QVector<std::complex<double> > *Correlation::execute(const QVector<double> &first, const QVector<double> &second, Transform &transform)
+QVector<double> *Correlation::execute(const QVector<double> &first, const QVector<double> &second, Transform &transform)
 {
     QVector<std::complex<double>> u(first.size());
     QVector<std::complex<double>> y(first.size());
@@ -33,6 +33,16 @@ QVector<std::complex<double> > *Correlation::execute(const QVector<double> &firs
         y[i] = std::complex<double>(second[i], 0);
     }
     return execute(u, y, transform);
+}
+
+QVector<std::complex<double> > *Correlation::executeFrequencyDomain(const QVector<std::complex<double> > &first, const QVector<std::complex<double> > &second, Transform &transform)
+{
+    return nullptr;
+}
+
+QVector<std::complex<double> > *Correlation::executeFrequencyDomain(const QVector<double> &first, const QVector<double> &second, Transform &transform)
+{
+    return nullptr;
 }
 
 OperationWithTwoOperands *Correlation::getInstance()

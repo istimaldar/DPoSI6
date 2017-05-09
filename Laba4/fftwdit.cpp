@@ -79,9 +79,16 @@ QVector<std::complex<double> > *FFTWDIT::directTransform(const QVector<double> &
     return directTransform(u);
 }
 
-QVector<std::complex<double>> * FFTWDIT::inverseTransform(const QVector<std::complex<double>> & data)
+QVector<double> * FFTWDIT::inverseTransform(const QVector<std::complex<double>> & data)
 {
-    return fastTransform(data, false);
+    QVector<std::complex<double>> *vector = fastTransform(data, false);
+    QVector<double> *result = new QVector<double>(vector->size());
+    for (unsigned int i = 0; i < vector->size(); i++)
+    {
+        (*result)[i] = (*vector)[i].real();
+    }
+    delete vector;
+    return result;
 }
 
 Transform *FFTWDIT::getInstance()

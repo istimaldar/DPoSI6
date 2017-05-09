@@ -8,14 +8,14 @@ class Filter
 {
 public:
     Filter();
-    static QVector<double> *genereteFilterFunction(unsigned int size, unsigned int M, double f);
+    static QVector<double> *buildLowFrequencyIR(unsigned int size, unsigned int M, double f);
+    static QVector<double> *buildHighFrequencyIR(unsigned int size, unsigned int M, double f);
     static QVector<double> *lowPassFilter(const QVector<double> &data, unsigned int M, unsigned int f, Transform *transform, const QVector<double> &impulseResponse);
     static QVector<std::complex<double>> *lowPassFilterFrequencyDomain(const QVector<double> &data, unsigned int M, unsigned int f, Transform *transform, const QVector<double> &impulseResponse);
     static QVector<double> *highPassFilter(const QVector<double> &data, unsigned int M, unsigned int f, Transform *transform);
     static QVector<std::complex<double>> *highPhssFilterFrequencyDomain(const QVector<double> &data, unsigned int M, unsigned int f, Transform *transform);
-    static QVector<double> *blackmansWindow(const QVector<double> &data, unsigned int M, Transform *transform);
+    static QVector<double> *blackmansWindow(const QVector<double> &data, unsigned int M);
     static QVector<std::complex<double>> *normalize(const QVector<std::complex<double>> &data);
-    static QVector<std::complex<double>> *inverse(const QVector<std::complex<double>> &data);
     static QVector<std::complex<double>> *bandPassFilter(QVector<std::complex<double>> &lowPass, QVector<std::complex<double>> &highPass, Transform *transform);
 };
 

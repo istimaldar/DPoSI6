@@ -9,7 +9,7 @@ class FFTWDIT : public Transform
 public:
     QVector<std::complex<double>> *directTransform(const QVector<std::complex<double>> &data);
     QVector<std::complex<double> > *directTransform(const QVector<double> &data);
-    QVector<std::complex<double> > *inverseTransform(const QVector<std::complex<double>> &data);
+    QVector<double> *inverseTransform(const QVector<std::complex<double>> &data);
     static Transform *getInstance();
 private:
     QVector<std::complex<double>> *transform(const QVector<std::complex<double>> &data);

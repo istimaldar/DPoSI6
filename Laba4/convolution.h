@@ -8,8 +8,10 @@ class Convolution : public OperationWithTwoOperands
 {
     static OperationWithTwoOperands *instance;
 public:
-    QVector<std::complex<double> > *execute(const QVector<std::complex<double> > &first, const QVector<std::complex<double> > &second, Transform &transform);
-    QVector<std::complex<double> > *execute(const QVector<double> &first, const QVector<double> &second, Transform &transform);
+    QVector<double> * execute(const QVector<std::complex<double>> & first, const QVector<std::complex<double>> & second, Transform & transform);
+    QVector<double> * execute(const QVector<double> & first, const QVector<double> & second, Transform & transform);
+    QVector<std::complex<double>> * executeFrequencyDomain(const QVector<std::complex<double>> & first, const QVector<std::complex<double>> & second, Transform & transform);
+    QVector<std::complex<double>> * executeFrequencyDomain(const QVector<double> & first, const QVector<double> & second, Transform & transform);
     static OperationWithTwoOperands *getInstance();
 private:
     Convolution();
